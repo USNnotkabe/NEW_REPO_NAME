@@ -4,361 +4,232 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $pet->pet_name }} - Pet Details</title>
+    <title>{{ $pet->pet_name }} - Details</title>
     <style>
     body {
         font-family: Arial, sans-serif;
-        margin: 20px;
-        background-color: #f5f5f5;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 40px 20px;
     }
 
     .container {
-        max-width: 900px;
+        max-width: 800px;
         margin: 0 auto;
         background: white;
-        padding: 30px;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
     }
 
-    .back-button {
-        display: inline-block;
-        padding: 8px 16px;
-        background: #007bff;
+    .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 30px;
+        color: white;
+    }
+
+    .back-link {
         color: white;
         text-decoration: none;
-        border-radius: 4px;
-        margin-bottom: 20px;
+        display: inline-block;
+        margin-bottom: 15px;
+        opacity: 0.9;
     }
 
-    .back-button:hover {
-        background: #0056b3;
+    .back-link:hover {
+        opacity: 1;
     }
 
     h1 {
-        color: #333;
-        border-bottom: 3px solid #007bff;
-        padding-bottom: 10px;
-        margin-bottom: 20px;
-    }
-
-    .pet-header {
-        background: #f8f9fa;
-        padding: 20px;
-        border-radius: 5px;
-        margin-bottom: 20px;
-        border-left: 5px solid #007bff;
-    }
-
-    .pet-header h2 {
-        margin: 0 0 10px 0;
-        color: #333;
-    }
-
-    .badges {
-        margin-top: 10px;
-    }
-
-    .badge {
-        display: inline-block;
-        padding: 6px 12px;
-        border-radius: 4px;
-        font-size: 14px;
-        font-weight: bold;
-        margin-right: 10px;
-    }
-
-    .badge-category {
-        background: #17a2b8;
-        color: white;
-    }
-
-    .badge-type {
-        background: #6c757d;
-        color: white;
-    }
-
-    .badge-adopted {
-        background: #6c757d;
-        color: white;
-    }
-
-    .badge-available {
-        background: #28a745;
-        color: white;
-    }
-
-    .info-section {
-        margin-bottom: 25px;
-    }
-
-    .info-section h3 {
-        color: #007bff;
-        border-bottom: 2px solid #e9ecef;
-        padding-bottom: 8px;
-        margin-bottom: 15px;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 20px;
-    }
-
-    table td {
-        padding: 12px;
-        border: 1px solid #dee2e6;
-    }
-
-    table td:first-child {
-        background: #f8f9fa;
-        font-weight: bold;
-        width: 200px;
-        color: #495057;
-    }
-
-    .price-box {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 25px;
-        border-radius: 8px;
-        text-align: center;
-        margin: 20px 0;
-    }
-
-    .price-box h2 {
         margin: 0;
         font-size: 2.5em;
     }
 
-    .price-box p {
-        margin: 10px 0 0 0;
-        font-size: 1.1em;
-        opacity: 0.9;
+    .pet-image {
+        width: 100%;
+        height: 400px;
+        object-fit: cover;
     }
 
-    .health-section {
-        background: #fff3cd;
-        border-left: 5px solid #ffc107;
-        padding: 20px;
-        border-radius: 5px;
-        margin-bottom: 20px;
+    .pet-details {
+        padding: 40px;
     }
 
-    .health-section h3 {
-        color: #856404;
-        border-bottom: 2px solid #ffeaa7;
-        margin-top: 0;
+    .detail-row {
+        display: flex;
+        padding: 15px 0;
+        border-bottom: 1px solid #eee;
     }
 
-    .health-item {
-        margin-bottom: 12px;
-        line-height: 1.6;
+    .detail-row:last-child {
+        border-bottom: none;
     }
 
-    .health-label {
+    .detail-label {
         font-weight: bold;
-        color: #856404;
+        color: #555;
+        width: 200px;
+        flex-shrink: 0;
     }
 
-    .description-box {
-        background: #e7f3ff;
-        border-left: 5px solid #007bff;
-        padding: 20px;
-        border-radius: 5px;
-        margin-bottom: 20px;
-    }
-
-    .description-box p {
-        margin: 0;
-        line-height: 1.6;
+    .detail-value {
         color: #333;
+        flex-grow: 1;
     }
 
-    .action-buttons {
-        margin-top: 30px;
-        padding-top: 20px;
-        border-top: 2px solid #e9ecef;
-        text-align: center;
-    }
-
-    .action-buttons button,
-    .action-buttons a {
-        margin: 0 5px;
-    }
-
-    button[type="submit"],
-    button[type="button"],
-    a button {
-        padding: 10px 20px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 14px;
+    .status-badge {
+        display: inline-block;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.9em;
         font-weight: bold;
     }
 
-    .btn-edit {
-        background: #007bff;
+    .status-available {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .status-adopted {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    .actions {
+        padding: 30px 40px;
+        background-color: #f8f9fa;
+        display: flex;
+        gap: 15px;
+    }
+
+    .btn {
+        padding: 12px 30px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: bold;
+        text-align: center;
+        flex: 1;
+        transition: all 0.3s;
+    }
+
+    .edit-btn {
+        background-color: #2196F3;
         color: white;
     }
 
-    .btn-edit:hover {
-        background: #0056b3;
+    .edit-btn:hover {
+        background-color: #0b7dda;
     }
 
-    .btn-delete {
-        background: #dc3545;
+    .delete-btn {
+        background-color: #f44336;
         color: white;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
     }
 
-    .btn-delete:hover {
-        background: #c82333;
-    }
-
-    .btn-back {
-        background: #6c757d;
-        color: white;
-    }
-
-    .btn-back:hover {
-        background: #5a6268;
-    }
-
-    .empty-value {
-        color: #6c757d;
-        font-style: italic;
+    .delete-btn:hover {
+        background-color: #da190b;
     }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <a href="{{ route('pets.index') }}" class="back-button">← Back to All Pets</a>
-
-        <h1>Pet Details</h1>
-
-        <div class="pet-header">
-            <h2>{{ $pet->pet_name }}</h2>
-            <div class="badges">
-                <span class="badge badge-category">{{ ucfirst($pet->category) }}</span>
-                <span class="badge badge-type">{{ ucfirst($pet->listing_type) }}</span>
-                @if($pet->status == 'adopted')
-                <span class="badge badge-adopted">✓ Adopted</span>
-                @else
-                <span class="badge badge-available">Available</span>
-                @endif
-            </div>
+        <div class="header">
+            <a href="{{ route('pets.index') }}" class="back-link">← Back to Pets List</a>
+            <h1>{{ $pet->pet_name }}</h1>
         </div>
 
-        <!-- Basic Information -->
-        <div class="info-section">
-            <h3>Basic Information</h3>
-            <table>
-                <tr>
-                    <td>Pet ID</td>
-                    <td>{{ $pet->id }}</td>
-                </tr>
-                <tr>
-                    <td>Pet Name</td>
-                    <td>{{ $pet->pet_name }}</td>
-                </tr>
-                <tr>
-                    <td>Category</td>
-                    <td>{{ ucfirst($pet->category) }}</td>
-                </tr>
-                <tr>
-                    <td>Breed</td>
-                    <td>{{ $pet->breed ?? 'N/A' }}</td>
-                </tr>
-                <tr>
-                    <td>Age</td>
-                    <td>{{ $pet->age ? $pet->age . ' years old' : 'N/A' }}</td>
-                </tr>
-                <tr>
-                    <td>Gender</td>
-                    <td>{{ $pet->gender ? ucfirst($pet->gender) : 'N/A' }}</td>
-                </tr>
-                <tr>
-                    <td>Color</td>
-                    <td>{{ $pet->color ?? 'N/A' }}</td>
-                </tr>
-                <tr>
-                    <td>Status</td>
-                    <td>{{ ucfirst($pet->status) }}</td>
-                </tr>
-
-
-
-                <tr>
-                    <td>Pet Listing</td>
-                    <td>{{ ucfirst($pet->listing_type ?? 'N/A') }}</td>
-
-                </tr>
-
-
-            </table>
-        </div>
-
-        <!-- Description -->
-        @if($pet->description)
-        <div class="info-section">
-            <h3>Description</h3>
-            <div class="description-box">
-                <p>{{ $pet->description }}</p>
-            </div>
-        </div>
+        @if($pet->image)
+        <img src="{{ asset('storage/' . $pet->image) }}" alt="{{ $pet->pet_name }}" class="pet-image">
+        @else
+        <img src="https://via.placeholder.com/800x400/667eea/ffffff?text=No+Image+Available" alt="No image"
+            class="pet-image">
         @endif
 
-        <!-- Price Information -->
-        <div class="price-box">
-            <h2>${{ number_format($pet->price ?? 0, 2) }}</h2>
-            <p>{{ $pet->listing_type == 'sell' ? 'Purchase Price' : 'Adoption Fee' }}</p>
-        </div>
+        <div class="pet-details">
+            <div class="detail-row">
+                <div class="detail-label">Category:</div>
+                <div class="detail-value">{{ ucfirst($pet->category) }}</div>
+            </div>
 
-        <!-- Health Information -->
-        @if($pet->allergies || $pet->medications || $pet->food_preferences)
-        <div class="health-section">
-            <h3>🏥 Health Information</h3>
+            <div class="detail-row">
+                <div class="detail-label">Breed:</div>
+                <div class="detail-value">{{ $pet->breed ?? 'Not specified' }}</div>
+            </div>
+
+            <div class="detail-row">
+                <div class="detail-label">Age:</div>
+                <div class="detail-value">{{ $pet->age ?? 'Unknown' }} years old</div>
+            </div>
+
+            <div class="detail-row">
+                <div class="detail-label">Gender:</div>
+                <div class="detail-value">{{ $pet->gender ? ucfirst($pet->gender) : 'Not specified' }}</div>
+            </div>
+
+            <div class="detail-row">
+                <div class="detail-label">Color:</div>
+                <div class="detail-value">{{ $pet->color ?? 'Not specified' }}</div>
+            </div>
+
+            <div class="detail-row">
+                <div class="detail-label">Description:</div>
+                <div class="detail-value">{{ $pet->description ?? 'No description available' }}</div>
+            </div>
+
+            <div class="detail-row">
+                <div class="detail-label">Price:</div>
+                <div class="detail-value">${{ number_format($pet->price, 2) }}</div>
+            </div>
+
+            <div class="detail-row">
+                <div class="detail-label">Listing Type:</div>
+                <div class="detail-value">{{ ucfirst($pet->listing_type) }}</div>
+            </div>
+
+            <div class="detail-row">
+                <div class="detail-label">Status:</div>
+                <div class="detail-value">
+                    <span class="status-badge status-{{ $pet->status }}">
+                        {{ ucfirst($pet->status) }}
+                    </span>
+                </div>
+            </div>
 
             @if($pet->allergies)
-            <div class="health-item">
-                <span class="health-label">Allergies:</span> {{ $pet->allergies }}
+            <div class="detail-row">
+                <div class="detail-label">Allergies:</div>
+                <div class="detail-value">{{ $pet->allergies }}</div>
             </div>
             @endif
 
             @if($pet->medications)
-            <div class="health-item">
-                <span class="health-label">Medications:</span> {{ $pet->medications }}
+            <div class="detail-row">
+                <div class="detail-label">Medications:</div>
+                <div class="detail-value">{{ $pet->medications }}</div>
             </div>
             @endif
 
             @if($pet->food_preferences)
-            <div class="health-item">
-                <span class="health-label">Food Preferences:</span> {{ $pet->food_preferences }}
+            <div class="detail-row">
+                <div class="detail-label">Food Preferences:</div>
+                <div class="detail-value">{{ $pet->food_preferences }}</div>
             </div>
             @endif
         </div>
-        @endif
 
-        <!-- Action Buttons -->
-        <div class="action-buttons">
-            <a href="{{ route('pets.edit', $pet->id) }}">
-                <button type="button" class="btn-edit">Edit</button>
-            </a>
-
-            <form action="{{ route('pets.destroy', $pet->id) }}" method="POST" style="display:inline;">
+        <div class="actions">
+            <a href="{{ route('pets.edit', $pet->id) }}" class="btn edit-btn">Edit Pet</a>
+            <form action="{{ route('pets.destroy', $pet->id) }}" method="POST" style="flex: 1;">
                 @csrf
                 @method('DELETE')
-                <button type="submit" class="btn-delete"
-                    onclick="return confirm('Are you sure you want to delete {{ $pet->pet_name }}?')">
-                    Delete
-                </button>
+                <button type="submit" class="btn delete-btn"
+                    onclick="return confirm('Are you sure you want to delete {{ $pet->pet_name }}? This action cannot be undone.')">Delete
+                    Pet</button>
             </form>
-
-            <a href="{{ route('pets.index') }}">
-                <button type="button" class="btn-back">Back to List</button>
-            </a>
         </div>
     </div>
 </body>

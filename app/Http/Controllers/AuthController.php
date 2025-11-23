@@ -7,7 +7,6 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
-
 class AuthController extends Controller
 {
     public function showRegister()
@@ -19,7 +18,6 @@ class AuthController extends Controller
     {
         return view('auth.login');
     }
-
 
     public function register(Request $request)
     {
@@ -37,18 +35,21 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-
         $validated = $request->validate([
             'email' => 'required|email',
             'password' => 'required|string',
         ]);
 
         if (Auth::attempt($validated)) {
+            // Redirect based on role
+            if (auth()->user()->isAdmin()) {
+                return redirect()->route('admin.dashboard');
+            }
+
             return redirect()->route('petlisting.index');
         }
 
         return back()->withErrors(['email' => 'Invalid credentials']);
-
     }
 
     public function apiRegister(Request $request)
@@ -58,11 +59,13 @@ class AuthController extends Controller
             'email' => 'required|email|unique:users',
             'password' => 'required|string|min:6|confirmed',
         ]);
+
         $User = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
         ]);
+
         return response()->json([
             'status' => 'success',
             'message' => 'User registered successfully',
@@ -76,13 +79,16 @@ class AuthController extends Controller
             'email' => 'required|email',
             'password' => 'required',
         ]);
+
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
+            $token = $user->createToken('api-token')->plainTextToken;
 
             return response()->json([
                 'status' => 'success',
                 'message' => 'Login successful',
                 'user' => $user,
+                'token' => $token,
             ], 200);
         }
 
@@ -90,5 +96,24 @@ class AuthController extends Controller
             'status' => 'error',
             'message' => 'Invalid credentials',
         ], 401);
+    }
+
+    public function apiLogout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Logged out successfully',
+        ]);
+    }
+
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('show.login')->with('success', 'Logged out successfully');
     }
 }

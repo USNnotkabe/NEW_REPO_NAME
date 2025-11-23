@@ -10,6 +10,7 @@ class Pet extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'pet_name',
         'category',
         'age',
@@ -17,13 +18,20 @@ class Pet extends Model
         'gender',
         'color',
         'description',
+         'image',
         'price',
         'listing_type',
-        'status',           // ← ADD THIS LINE!
+        'status',
         'allergies',
         'medications',
         'food_preferences',
+        'image_url',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function getFormattedStatusAttribute()
     {

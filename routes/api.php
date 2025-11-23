@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PetListingController;
 use App\Http\Controllers\AuthController;
 
+// Test route (public)
 Route::get('/test', function () {
     return response()->json([
         'status' => 'success',
@@ -11,14 +12,18 @@ Route::get('/test', function () {
     ]);
 });
 
-// Auth routes
+// Public auth routes
 Route::post('/register', [AuthController::class, 'apiRegister']);
 Route::post('/login', [AuthController::class, 'apiLogin']);
 
-// Pet CRUD routes - YOU NEED ALL OF THESE
+// Public read-only pet routes
 Route::get('/petlisting', [PetListingController::class, 'index']);
 Route::get('/petlisting/{id}', [PetListingController::class, 'show']);
-Route::post('/petlisting', [PetListingController::class, 'store']);      // ← ADD THIS
-Route::put('/petlisting/{id}', [PetListingController::class, 'update']);  // ← ADD THIS
-Route::delete('/petlisting/{id}', [PetListingController::class, 'destroy']); // ← ADD THIS
-Route::delete('/petlisting/{id}', [PetListingController::class, 'destroy']); // ← ADD THIS
+
+// Protected routes (require authentication)
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/logout', [AuthController::class, 'apiLogout']);
+    Route::post('/petlisting', [PetListingController::class, 'store']);
+    Route::put('/petlisting/{id}', [PetListingController::class, 'update']);
+    Route::delete('/petlisting/{id}', [PetListingController::class, 'destroy']);
+});
