@@ -48,10 +48,7 @@ class User extends Authenticatable
         ];
     }
 
-    /**
-     * Get the pets for the user.
-     */
-     // Relationships
+    // Relationships
     public function pets()
     {
         return $this->hasMany(Pet::class);
@@ -60,6 +57,11 @@ class User extends Authenticatable
     public function adoptionRequests()
     {
         return $this->hasMany(AdoptionRequest::class);
+    }
+
+    public function adoptionHistory()
+    {
+        return $this->hasMany(AdoptionHistory::class);
     }
 
     // Role checks

@@ -4,6 +4,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PetController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdoptionRequestController;
+use App\Http\Controllers\AdoptionHistoryController;
+use App\Http\Controllers\OwnerRequestController;  // ← ADD THIS!
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PetListingController;
 
@@ -29,25 +31,29 @@ Route::middleware('auth')->group(function () {
     // User routes
     Route::resource('pets', PetController::class);
 
-    // Adoption requests (for users)
-    Route::get('/my-adoption-requests', [AdoptionRequestController::class, 'myRequests'])->name('adoption.my-requests');
+    // Adoption requests (for users wanting to adopt/buy)
+    Route::get('/my-adoption-requests', [AdoptionRequestController::class, 'myRequests'])->name('adoption.my-requests');  // ← ADD THIS!
     Route::get('/adopt/{pet}', [AdoptionRequestController::class, 'create'])->name('adoption.create');
     Route::post('/adopt', [AdoptionRequestController::class, 'store'])->name('adoption.store');
     Route::delete('/adoption-request/{id}/cancel', [AdoptionRequestController::class, 'cancel'])->name('adoption.cancel');
+
+    // Adoption history
+    Route::get('/my-adoption-history', [AdoptionHistoryController::class, 'index'])->name('adoption.history');
+
+    // Owner request management (NEW! - for pet owners to approve/reject)
+    Route::get('/my-pet-requests', [OwnerRequestController::class, 'index'])->name('owner.requests');
+    Route::post('/pet-request/{id}/approve', [OwnerRequestController::class, 'approve'])->name('owner.approve-request');
+    Route::post('/pet-request/{id}/reject', [OwnerRequestController::class, 'reject'])->name('owner.reject-request');
 });
 
-// Admin routes (only for admins)
+// Admin routes (only for admins - monitoring only)
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
     Route::get('/users', [AdminController::class, 'users'])->name('users');
     Route::get('/pets', [AdminController::class, 'pets'])->name('pets');
-    Route::get('/adoption-requests', [AdminController::class, 'adoptionRequests'])->name('adoption-requests');
-
-    // Adoption request actions
-    Route::post('/adoption-request/{id}/approve', [AdminController::class, 'approveRequest'])->name('approve-request');
-    Route::post('/adoption-request/{id}/reject', [AdminController::class, 'rejectRequest'])->name('reject-request');
 
     // User/Pet management
     Route::delete('/users/{id}', [AdminController::class, 'deleteUser'])->name('delete-user');
-    Route::delete('/pets/{id}', [AdminController::class, 'deletePet'])->name('delete-pet');
+
+    Route::get('/adopt/{pet}', [AdoptionRequestController::class, 'create'])->name('adoption.create');
 });

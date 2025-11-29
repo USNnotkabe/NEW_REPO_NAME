@@ -5,21 +5,22 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class AdoptionRequest extends Model
+class AdoptionHistory extends Model
 {
     use HasFactory;
+
+    protected $table = 'adoption_history';
 
     protected $fillable = [
         'user_id',
         'pet_id',
-        'message',
-        'status',
-        'owner_notes',
-        'reviewed_at',
+        'adoption_request_id',
+        'adoption_date',
+        'notes',
     ];
 
     protected $casts = [
-        'reviewed_at' => 'datetime',
+        'adoption_date' => 'date',
     ];
 
     // Relationships
@@ -33,19 +34,8 @@ class AdoptionRequest extends Model
         return $this->belongsTo(Pet::class);
     }
 
-    // Helper methods
-    public function isPending()
+    public function adoptionRequest()
     {
-        return $this->status === 'pending';
-    }
-
-    public function isApproved()
-    {
-        return $this->status === 'approved';
-    }
-
-    public function isRejected()
-    {
-        return $this->status === 'rejected';
+        return $this->belongsTo(AdoptionRequest::class);
     }
 }
