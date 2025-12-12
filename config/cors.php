@@ -2,29 +2,20 @@
 
 return [
 
-    /*
-    |--------------------------------------------------------------------------
-    | Cross-Origin Resource Sharing (CORS) Configuration
-    |--------------------------------------------------------------------------
-    |
-    | Here you may configure your settings for cross-origin resource sharing
-    | or "CORS". This determines what cross-origin operations may execute
-    | in web browsers. You are free to adjust these settings as needed.
-    |
-    */
 
     'paths' => ['api/*', 'sanctum/csrf-cookie'],
 
     'allowed_methods' => ['*'],
 
-    // ✅ FIXED: Allow all localhost ports for development
-    'allowed_origins' => ['*'],
-    
-    // ✅ OR use patterns to allow any localhost port:
-    'allowed_origins_patterns' => [
-        '/^http:\/\/localhost:\d+$/',
-        '/^http:\/\/127\.0\.0\.1:\d+$/',
+    'allowed_origins' => [
+        'http://localhost:5173',
+        'http://localhost:5174',  // Add this line
+        'http://127.0.0.1:5173',
+        'http://127.0.0.1:5174',  // Add this line too
     ],
+
+
+    'allowed_origins_patterns' => [],
 
     'allowed_headers' => ['*'],
 
