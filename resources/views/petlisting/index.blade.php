@@ -238,7 +238,7 @@
             @foreach($pets as $pet)
             <div class="pet-card">
                 @if($pet->image)
-                <img src="{{ asset('storage/' . $pet->image) }}" alt="{{ $pet->pet_name }}">
+             <img src="{{ $pet->image }}" alt="{{ $pet->pet_name }}">
                 @else
                 <img src="https://via.placeholder.com/300x250/667eea/ffffff?text={{ $pet->pet_name }}" alt="No image">
                 @endif

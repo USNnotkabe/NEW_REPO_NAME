@@ -4,7 +4,11 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
+<<<<<<< HEAD
     "content-hash": "27943884c612257684f2de81060ef92b",
+=======
+    "content-hash": "f52895215b50dcc2c038107b20100f19",
+>>>>>>> 92e737c (Updated backend with my changes)
     "packages": [
         {
             "name": "brick/math",
@@ -137,6 +141,7 @@
         },
         {
             "name": "cloudinary-labs/cloudinary-laravel",
+<<<<<<< HEAD
             "version": "2.3.0",
             "source": {
                 "type": "git",
@@ -167,13 +172,43 @@
                 "orchestra/testbench": "^8.0|^9.0|^10.0",
                 "pestphp/pest": "^2.35|^3.0",
                 "sempro/phpunit-pretty-print": "^1.0"
+=======
+            "version": "3.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/cloudinary-community/cloudinary-laravel.git",
+                "reference": "575f4508f9fb50ee9b915e7b53868f5bc9ccf2bb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/cloudinary-community/cloudinary-laravel/zipball/575f4508f9fb50ee9b915e7b53868f5bc9ccf2bb",
+                "reference": "575f4508f9fb50ee9b915e7b53868f5bc9ccf2bb",
+                "shasum": ""
+            },
+            "require": {
+                "cloudinary/cloudinary_php": "^3.0",
+                "ext-json": "*",
+                "illuminate/support": "^11.0|^12.0",
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.20",
+                "mockery/mockery": "^1.6",
+                "orchestra/testbench": "^8.0|^9.0|^10.0",
+                "pestphp/pest": "^2.35|^3.0",
+                "phpspec/prophecy-phpunit": "^2.3",
+                "sempro/phpunit-pretty-print": "^1.2"
+>>>>>>> 92e737c (Updated backend with my changes)
             },
             "type": "library",
             "extra": {
                 "laravel": {
+<<<<<<< HEAD
                     "aliases": {
                         "Cloudinary": "CloudinaryLabs\\CloudinaryLaravel\\Facades\\Cloudinary"
                     },
+=======
+>>>>>>> 92e737c (Updated backend with my changes)
                     "providers": [
                         "CloudinaryLabs\\CloudinaryLaravel\\CloudinaryServiceProvider"
                     ]
@@ -181,7 +216,11 @@
             },
             "autoload": {
                 "files": [
+<<<<<<< HEAD
                     "src/Support/helpers.php"
+=======
+                    "src/helpers.php"
+>>>>>>> 92e737c (Updated backend with my changes)
                 ],
                 "psr-4": {
                     "CloudinaryLabs\\CloudinaryLaravel\\": "src/"
@@ -193,9 +232,14 @@
             ],
             "authors": [
                 {
+<<<<<<< HEAD
                     "name": "Prosper Otemuyiwa",
                     "email": "prosperotemuyiwa@gmail.com",
                     "homepage": "https://github.com/unicodeveloper"
+=======
+                    "name": "Josh Manders",
+                    "homepage": "https://github.com/joshmanders"
+>>>>>>> 92e737c (Updated backend with my changes)
                 }
             ],
             "description": "A Laravel Cloudinary Package",
@@ -210,6 +254,7 @@
             ],
             "support": {
                 "issues": "https://github.com/cloudinary-community/cloudinary-laravel/issues",
+<<<<<<< HEAD
                 "source": "https://github.com/cloudinary-community/cloudinary-laravel/tree/2.3.0"
             },
             "time": "2025-03-06T20:51:20+00:00"
@@ -246,13 +291,49 @@
             },
             "require-dev": {
                 "consolidation/robo": "~1",
+=======
+                "source": "https://github.com/cloudinary-community/cloudinary-laravel/tree/3.0.2"
+            },
+            "time": "2025-10-13T05:21:21+00:00"
+        },
+        {
+            "name": "cloudinary/cloudinary_php",
+            "version": "3.1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/cloudinary/cloudinary_php.git",
+                "reference": "c373c01db4ecfe9637b1cb384ab1587c4af86793"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/cloudinary/cloudinary_php/zipball/c373c01db4ecfe9637b1cb384ab1587c4af86793",
+                "reference": "c373c01db4ecfe9637b1cb384ab1587c4af86793",
+                "shasum": ""
+            },
+            "require": {
+                "cloudinary/transformation-builder-sdk": "^2",
+                "ext-json": "*",
+                "guzzlehttp/guzzle": "^7.4.5",
+                "guzzlehttp/promises": "^1.5.3|^2.0",
+                "guzzlehttp/psr7": "^2.7",
+                "monolog/monolog": "^2|^3",
+                "php": ">=8.0.0",
+                "psr/log": "^2|^3"
+            },
+            "require-dev": {
+>>>>>>> 92e737c (Updated backend with my changes)
                 "ext-dom": "*",
                 "ext-libxml": "*",
                 "ext-zip": "*",
                 "friendsofphp/php-cs-fixer": "*",
                 "phpmd/phpmd": "*",
+<<<<<<< HEAD
                 "squizlabs/php_codesniffer": "3.*",
                 "symfony/phpunit-bridge": "^5.2"
+=======
+                "squizlabs/php_codesniffer": "*",
+                "symfony/phpunit-bridge": "^7.2"
+>>>>>>> 92e737c (Updated backend with my changes)
             },
             "type": "library",
             "autoload": {
@@ -282,6 +363,7 @@
             "support": {
                 "email": "info@cloudinary.com",
                 "issues": "https://github.com/cloudinary/cloudinary_php/issues",
+<<<<<<< HEAD
                 "source": "https://github.com/cloudinary/cloudinary_php/tree/2.13.1"
             },
             "time": "2024-03-21T11:56:00+00:00"
@@ -312,13 +394,43 @@
             },
             "require-dev": {
                 "consolidation/robo": "~1",
+=======
+                "source": "https://github.com/cloudinary/cloudinary_php/tree/3.1.2"
+            },
+            "time": "2025-09-21T10:52:52+00:00"
+        },
+        {
+            "name": "cloudinary/transformation-builder-sdk",
+            "version": "2.1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/cloudinary/php-transformation-builder-sdk.git",
+                "reference": "6ff4a84f14dbc5197563db63b6abbbe77a68d7e7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/cloudinary/php-transformation-builder-sdk/zipball/6ff4a84f14dbc5197563db63b6abbbe77a68d7e7",
+                "reference": "6ff4a84f14dbc5197563db63b6abbbe77a68d7e7",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "php": ">=8.0.0"
+            },
+            "require-dev": {
+>>>>>>> 92e737c (Updated backend with my changes)
                 "ext-dom": "*",
                 "ext-libxml": "*",
                 "ext-zip": "*",
                 "friendsofphp/php-cs-fixer": "*",
                 "phpmd/phpmd": "*",
+<<<<<<< HEAD
                 "squizlabs/php_codesniffer": "3.*",
                 "symfony/phpunit-bridge": "^5.2"
+=======
+                "squizlabs/php_codesniffer": "*",
+                "symfony/phpunit-bridge": "^7.2"
+>>>>>>> 92e737c (Updated backend with my changes)
             },
             "type": "library",
             "autoload": {
@@ -348,9 +460,15 @@
             "support": {
                 "email": "info@cloudinary.com",
                 "issues": "https://github.com/cloudinary/php-transformation-builder-sdk/issues",
+<<<<<<< HEAD
                 "source": "https://github.com/cloudinary/php-transformation-builder-sdk/tree/1.5.0"
             },
             "time": "2024-05-27T12:26:00+00:00"
+=======
+                "source": "https://github.com/cloudinary/php-transformation-builder-sdk/tree/2.1.2"
+            },
+            "time": "2025-02-03T11:14:03+00:00"
+>>>>>>> 92e737c (Updated backend with my changes)
         },
         {
             "name": "dflydev/dot-access-data",
@@ -8750,12 +8868,12 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": "^8.2"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "plugin-api-version": "2.6.0"
 }

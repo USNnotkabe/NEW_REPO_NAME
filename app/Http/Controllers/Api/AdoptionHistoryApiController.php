@@ -4,27 +4,41 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\AdoptionHistory;
+use Illuminate\Support\Facades\DB;
 
 class AdoptionHistoryApiController extends Controller
 {
-    // Get user's adoption history
-    public function index(Request $request)
+    public function myHistory(Request $request)
     {
-        $history = AdoptionHistory::with(['pet', 'adoptionRequest'])
-            ->where('user_id', $request->user()->id)
-            ->orderBy('adoption_date', 'desc')
+        $userId = $request->user()->id;
+
+        // Get ALL adoption history where user is involved (as adopter OR original owner)
+        $history = DB::table('adoption_history')
+            ->join('pets', 'adoption_history.pet_id', '=', 'pets.id')
+            ->join('users as original_owner', 'pets.user_id', '=', 'original_owner.id')
+            ->join('users as new_owner', 'adoption_history.user_id', '=', 'new_owner.id')
+            ->where(function($query) use ($userId) {
+                $query->where('adoption_history.user_id', $userId)  // I adopted
+                      ->orWhere('pets.user_id', $userId);           // My pet was adopted
+            })
+            ->select(
+                'adoption_history.*',
+                'pets.pet_name',
+                'pets.breed',
+                'pets.category',
+                'pets.image',
+                'original_owner.name as original_owner_name',
+                'new_owner.name as new_owner_name'
+            )
+            ->orderBy('adoption_history.adoption_date', 'desc')
             ->get()
-            ->map(function ($record) {
-                if ($record->pet && $record->pet->image) {
-                    $record->pet->image_url = asset('storage/' . $record->pet->image);
+            ->map(function ($item) {
+                if ($item->image) {
+                    $item->image_url = asset('storage/' . $item->image);
                 }
-                return $record;
+                return $item;
             });
 
-        return response()->json([
-            'success' => true,
-            'data' => $history
-        ]);
+        return response()->json($history);
     }
 }

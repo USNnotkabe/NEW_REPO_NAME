@@ -7,7 +7,6 @@ use App\Models\Pet;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 
-
 class PetController extends Controller
 {
     public function index()
@@ -22,87 +21,86 @@ class PetController extends Controller
         return view('pets.create');
     }
 
-    public function store(Request $request)
-    {
-        $data = $request->validate([
-            'pet_name' => 'required',
-            'category' => 'required|in:dog,cat',
-            'age' => 'nullable|integer|min:0',
-            'breed' => 'nullable',
-            'gender' => 'nullable|in:male,female',
-            'color' => 'nullable',
-            'description' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'price' => 'required|numeric|min:0',
-            'listing_type' => 'required|in:sell,adopt',
-            'status' => 'required|in:available,adopted',
-            'allergies' => 'nullable',
-            'medications' => 'nullable',
-            'food_preferences' => 'nullable',
-        ]);
+public function store(Request $request)
+{
+    $data = $request->validate([
+        'pet_name' => 'required',
+        'category' => 'required|in:dog,cat',
+        'age' => 'nullable|integer|min:0',
+        'breed' => 'nullable',
+        'gender' => 'nullable|in:male,female',
+        'color' => 'nullable',
+        'description' => 'nullable|string',
+        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        'price' => 'required|numeric|min:0',
+        'listing_type' => 'required|in:sell,adopt',
+        'status' => 'required|in:available,adopted',
+        'allergies' => 'nullable',
+        'medications' => 'nullable',
+        'food_preferences' => 'nullable',
+    ]);
 
-        // Handle image upload
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('pets', 'public');
-            $data['image'] = $imagePath;
+    // Handle image upload to Cloudinary
+    if ($request->hasFile('image')) {
+        try {
+            // Use Laravel's Cloudinary facade with custom HTTP client
+            $uploadResult = $request->file('image')->storeOnCloudinary('pets');
+            $data['image'] = $uploadResult->getSecurePath();
+            
+        } catch (\Exception $e) {
+            \Log::error('Cloudinary upload failed: ' . $e->getMessage());
+            return back()->withErrors(['image' => 'Failed to upload image: ' . $e->getMessage()]);
         }
-
-        // Automatically assign the authenticated user
-        $data['user_id'] = Auth::id();
-
-        $newPet = Pet::create($data);
-        return redirect(route('pets.index'))->with('success', 'Pet added successfully!');
     }
 
-    public function edit(Pet $pet)
-    {
-        // Check if user owns this pet
-        if ($pet->user_id !== Auth::id()) {
-            abort(403, 'Unauthorized - You can only edit your own pets');
-        }
+    // Automatically assign the authenticated user
+    $data['user_id'] = Auth::id();
 
-        return view('pets.edit', ['pet' => $pet]);
+    $newPet = Pet::create($data);
+    return redirect(route('pets.index'))->with('success', 'Pet added successfully!');
+}
+
+public function update(Request $request, Pet $pet)
+{
+    // Check if user owns this pet
+    if ($pet->user_id !== Auth::id()) {
+        abort(403, 'Unauthorized - You can only edit your own pets');
     }
 
-    public function update(Request $request, Pet $pet)
-    {
-        // Check if user owns this pet
-        if ($pet->user_id !== Auth::id()) {
-            abort(403, 'Unauthorized - You can only edit your own pets');
+    $data = $request->validate([
+        'pet_name' => 'required',
+        'category' => 'required|in:dog,cat',
+        'age' => 'nullable|integer|min:0',
+        'breed' => 'nullable',
+        'gender' => 'nullable|in:male,female',
+        'color' => 'nullable',
+        'description' => 'nullable|string',
+        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        'price' => 'required|numeric|min:0',
+        'listing_type' => 'required|in:sell,adopt',
+        'status' => 'required|in:available,adopted',
+        'allergies' => 'nullable|string',
+        'medications' => 'nullable|string',
+        'food_preferences' => 'nullable|string',
+    ]);
+
+    // Handle image upload to Cloudinary
+    if ($request->hasFile('image')) {
+        try {
+            // Use Laravel's Cloudinary facade
+            $uploadResult = $request->file('image')->storeOnCloudinary('pets');
+            $data['image'] = $uploadResult->getSecurePath();
+            
+        } catch (\Exception $e) {
+            \Log::error('Cloudinary upload failed: ' . $e->getMessage());
+            return back()->withErrors(['image' => 'Failed to upload image: ' . $e->getMessage()]);
         }
-
-        $data = $request->validate([
-            'pet_name' => 'required',
-            'category' => 'required|in:dog,cat',
-            'age' => 'nullable|integer|min:0',
-            'breed' => 'nullable',
-            'gender' => 'nullable|in:male,female',
-            'color' => 'nullable',
-            'description' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'price' => 'required|numeric|min:0',
-            'listing_type' => 'required|in:sell,adopt',
-            'status' => 'required|in:available,adopted',
-            'allergies' => 'nullable|string',
-            'medications' => 'nullable|string',
-            'food_preferences' => 'nullable|string',
-        ]);
-
-        // Handle image upload
-        if ($request->hasFile('image')) {
-            // Delete old image if exists
-            if ($pet->image) {
-                Storage::disk('public')->delete($pet->image);
-            }
-
-            $imagePath = $request->file('image')->store('pets', 'public');
-            $data['image'] = $imagePath;
-        }
-
-        $pet->update($data);
-
-        return redirect()->route('pets.index')->with('success', 'Pet updated successfully!');
     }
+
+    $pet->update($data);
+
+    return redirect()->route('pets.index')->with('success', 'Pet updated successfully!');
+}
 
     public function show(Pet $pet)
     {
@@ -119,11 +117,6 @@ class PetController extends Controller
         // Check if user owns this pet
         if ($pet->user_id !== Auth::id()) {
             abort(403, 'Unauthorized - You can only delete your own pets');
-        }
-
-        // Delete image if exists
-        if ($pet->image) {
-            Storage::disk('public')->delete($pet->image);
         }
 
         $pet->delete();

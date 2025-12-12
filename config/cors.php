@@ -17,9 +17,14 @@ return [
 
     'allowed_methods' => ['*'],
 
+    // ✅ FIXED: Allow all localhost ports for development
     'allowed_origins' => ['*'],
-
-    'allowed_origins_patterns' => [],
+    
+    // ✅ OR use patterns to allow any localhost port:
+    'allowed_origins_patterns' => [
+        '/^http:\/\/localhost:\d+$/',
+        '/^http:\/\/127\.0\.0\.1:\d+$/',
+    ],
 
     'allowed_headers' => ['*'],
 
