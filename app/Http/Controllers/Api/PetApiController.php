@@ -7,8 +7,21 @@ use Illuminate\Http\Request;
 use App\Models\Pet;
 use Illuminate\Support\Facades\Storage;
 
-class PetApiController extends Controller
+class PetApiController extends Controller{
+    // Helper to generate correct image URLs dynamically with CORS support
+  private function appendImageUrl($pet)
 {
+    if ($pet && $pet->image) {
+        // Serve through API route with CORS headers
+        $baseUrl = request()->getSchemeAndHttpHost();
+        $filename = basename($pet->image);
+        $pet->image_url = $baseUrl . '/api/pet-image/' . $filename;
+    } else {
+        $pet->image_url = null;
+    }
+    return $pet;
+}
+
     // Get all available pets (public)
     public function index()
     {
@@ -17,10 +30,7 @@ class PetApiController extends Controller
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(function ($pet) {
-                if ($pet->image) {
-                    $pet->image_url = asset('storage/' . $pet->image);
-                }
-                return $pet;
+                return $this->appendImageUrl($pet);
             });
 
         return response()->json([
@@ -34,13 +44,9 @@ class PetApiController extends Controller
     {
         $pet = Pet::with('user:id,name,email')->findOrFail($id);
 
-        if ($pet->image) {
-            $pet->image_url = asset('storage/' . $pet->image);
-        }
-
         return response()->json([
             'success' => true,
-            'data' => $pet
+            'data' => $this->appendImageUrl($pet)
         ]);
     }
 
@@ -51,10 +57,7 @@ class PetApiController extends Controller
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(function ($pet) {
-                if ($pet->image) {
-                    $pet->image_url = asset('storage/' . $pet->image);
-                }
-                return $pet;
+                return $this->appendImageUrl($pet);
             });
 
         return response()->json([
@@ -89,14 +92,10 @@ class PetApiController extends Controller
 
         $pet = Pet::create($validated);
 
-        if ($pet->image) {
-            $pet->image_url = asset('storage/' . $pet->image);
-        }
-
         return response()->json([
             'success' => true,
             'message' => 'Pet posted successfully',
-            'data' => $pet
+            'data' => $this->appendImageUrl($pet)
         ], 201);
     }
 
@@ -137,14 +136,10 @@ class PetApiController extends Controller
 
         $pet->update($validated);
 
-        if ($pet->image) {
-            $pet->image_url = asset('storage/' . $pet->image);
-        }
-
         return response()->json([
             'success' => true,
             'message' => 'Pet updated successfully',
-            'data' => $pet
+            'data' => $this->appendImageUrl($pet->fresh())
         ]);
     }
 

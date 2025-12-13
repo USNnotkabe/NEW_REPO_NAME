@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 class AdoptionHistoryApiController extends Controller
 {
-    public function myHistory(Request $request)
+    public function index(Request $request)
     {
         $userId = $request->user()->id;
 
@@ -17,9 +17,9 @@ class AdoptionHistoryApiController extends Controller
             ->join('pets', 'adoption_history.pet_id', '=', 'pets.id')
             ->join('users as original_owner', 'pets.user_id', '=', 'original_owner.id')
             ->join('users as new_owner', 'adoption_history.user_id', '=', 'new_owner.id')
-            ->where(function($query) use ($userId) {
+            ->where(function ($query) use ($userId) {
                 $query->where('adoption_history.user_id', $userId)  // I adopted
-                      ->orWhere('pets.user_id', $userId);           // My pet was adopted
+                    ->orWhere('pets.user_id', $userId);           // My pet was adopted
             })
             ->select(
                 'adoption_history.*',
@@ -34,7 +34,10 @@ class AdoptionHistoryApiController extends Controller
             ->get()
             ->map(function ($item) {
                 if ($item->image) {
-                    $item->image_url = asset('storage/' . $item->image);
+                    // Use dynamic URL for CORS support
+                    $baseUrl = request()->getSchemeAndHttpHost();
+                    $filename = basename($item->image);
+                    $item->image_url = $baseUrl . '/api/pet-image/' . $filename;
                 }
                 return $item;
             });

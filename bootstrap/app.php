@@ -13,10 +13,14 @@ return Application::configure(basePath: dirname(__DIR__))
         apiPrefix: 'api',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // Add CORS middleware for API requests
+        $middleware->api(prepend: [
+            \Illuminate\Http\Middleware\HandleCors::class,
+        ]);
+
         // Remove CSRF from API
         $middleware->validateCsrfTokens(except: [
             'api/*',
-            '*'
         ]);
 
         $middleware->alias([

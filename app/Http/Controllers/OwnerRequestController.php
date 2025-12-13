@@ -1,75 +1,117 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\AdoptionRequest;
 use App\Models\Pet;
+use Illuminate\Support\Facades\DB;
 
-class OwnerRequestController extends Controller
+class OwnerRequestController extends Controller  // ✅ FIXED
 {
+    // Get all requests for pets owned by authenticated user
     public function index()
     {
-        // Get all pets owned by the logged-in user
-        $petIds = Pet::where('user_id', auth()->id())->pluck('id');
-
-        // Get all requests for those pets
-        $requests = AdoptionRequest::with(['user', 'pet'])
-            ->whereIn('pet_id', $petIds)
+        $requests = AdoptionRequest::with(['pet', 'user'])
+            ->whereHas('pet', function ($query) {
+                $query->where('user_id', auth()->id());
+            })
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('owner.requests', compact('requests'));
+        return response()->json($requests, 200);
     }
 
+    // Approve adoption request
     public function approve($id)
     {
-        $request = AdoptionRequest::findOrFail($id);
+        DB::beginTransaction();
 
-        // Check if the logged-in user owns this pet
-        if ($request->pet->user_id !== auth()->id()) {
-            abort(403, 'Unauthorized - You can only manage requests for your own pets');
+        try {
+            $adoptionRequest = AdoptionRequest::findOrFail($id);
+
+            if ($adoptionRequest->status !== 'pending') {
+                DB::rollBack();
+                return response()->json([
+                    'message' => 'This request has already been processed'
+                ], 400);
+            }
+
+            $pet = Pet::findOrFail($adoptionRequest->pet_id);
+
+            if ($pet->user_id !== auth()->id()) {
+                DB::rollBack();
+                return response()->json([
+                    'message' => 'Unauthorized - You are not the pet owner'
+                ], 403);
+            }
+
+            // Approve request
+            AdoptionRequest::where('id', $id)->update(['status' => 'approved']);
+
+            // Mark pet as adopted
+            Pet::where('id', $adoptionRequest->pet_id)->update(['status' => 'adopted']);
+
+            // Reject all other pending requests for this pet
+            AdoptionRequest::where('pet_id', $adoptionRequest->pet_id)
+                ->where('id', '!=', $id)
+                ->where('status', 'pending')
+                ->update(['status' => 'rejected']);
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Request approved successfully. Pet marked as adopted and other requests rejected.'
+            ], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'message' => 'Error approving request: ' . $e->getMessage()
+            ], 500);
         }
-
-        $request->update([
-            'status' => 'approved',
-            'reviewed_at' => now(),
-        ]);
-
-        // Update pet status
-        $request->pet->update(['status' => 'adopted']);
-
-        // Create adoption history
-        \App\Models\AdoptionHistory::create([
-            'user_id' => $request->user_id,
-            'pet_id' => $request->pet_id,
-            'adoption_request_id' => $request->id,
-            'adoption_date' => now(),
-            'notes' => 'Approved by pet owner: ' . auth()->user()->name,
-        ]);
-
-        return redirect()->back()->with('success', 'Request approved! The adopter can now contact you.');
     }
 
+    // Reject adoption request
     public function reject(Request $request, $id)
     {
+        // Make owner_notes optional
         $validated = $request->validate([
-            'owner_notes' => 'required|string|min:10',
+            'owner_notes' => 'nullable|string'
         ]);
 
-        $adoptionRequest = AdoptionRequest::findOrFail($id);
+        try {
+            $adoptionRequest = AdoptionRequest::findOrFail($id);
 
-        // Check if the logged-in user owns this pet
-        if ($adoptionRequest->pet->user_id !== auth()->id()) {
-            abort(403, 'Unauthorized - You can only manage requests for your own pets');
+            if ($adoptionRequest->status !== 'pending') {
+                return response()->json([
+                    'message' => 'This request has already been processed'
+                ], 400);
+            }
+
+            $pet = Pet::findOrFail($adoptionRequest->pet_id);
+
+            if ($pet->user_id !== auth()->id()) {
+                return response()->json([
+                    'message' => 'Unauthorized - You are not the pet owner'
+                ], 403);
+            }
+
+            AdoptionRequest::where('id', $id)->update([
+                'status' => 'rejected',
+                'owner_notes' => $validated['owner_notes'] ?? null
+            ]);
+
+            return response()->json([
+                'message' => 'Request rejected successfully'
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error rejecting request: ' . $e->getMessage()
+            ], 500);
         }
-
-        $adoptionRequest->update([
-            'status' => 'rejected',
-            'reviewed_at' => now(),
-            'owner_notes' => $validated['owner_notes'],
-        ]);
-
-        return redirect()->back()->with('success', 'Request rejected.');
     }
 }

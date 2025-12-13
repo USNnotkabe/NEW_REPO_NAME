@@ -10,6 +10,17 @@ use App\Models\AdoptionHistory;
 
 class OwnerRequestApiController extends Controller
 {
+    // Helper to add image URL with CORS support
+    private function appendImageUrl($pet)
+    {
+        if ($pet && $pet->image) {
+            $baseUrl = request()->getSchemeAndHttpHost();
+            $filename = basename($pet->image);
+            $pet->image_url = $baseUrl . '/api/pet-image/' . $filename;
+        }
+        return $pet;
+    }
+
     // Get requests for owner's pets
     public function index(Request $request)
     {
@@ -22,8 +33,8 @@ class OwnerRequestApiController extends Controller
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(function ($req) {
-                if ($req->pet && $req->pet->image) {
-                    $req->pet->image_url = asset('storage/' . $req->pet->image);
+                if ($req->pet) {
+                    $this->appendImageUrl($req->pet);
                 }
                 return $req;
             });
@@ -66,8 +77,8 @@ class OwnerRequestApiController extends Controller
 
         $adoptionRequest->load(['user', 'pet']);
 
-        if ($adoptionRequest->pet && $adoptionRequest->pet->image) {
-            $adoptionRequest->pet->image_url = asset('storage/' . $adoptionRequest->pet->image);
+        if ($adoptionRequest->pet) {
+            $this->appendImageUrl($adoptionRequest->pet);
         }
 
         return response()->json([
@@ -80,36 +91,41 @@ class OwnerRequestApiController extends Controller
     // Reject a request
     public function reject(Request $request, $id)
     {
+        // Make owner_notes optional
         $validated = $request->validate([
-            'owner_notes' => 'required|string|min:10',
+            'owner_notes' => 'nullable|string'
         ]);
 
-        $adoptionRequest = AdoptionRequest::findOrFail($id);
+        try {
+            $adoptionRequest = AdoptionRequest::findOrFail($id);
 
-        // Check if the logged-in user owns this pet
-        if ($adoptionRequest->pet->user_id !== $request->user()->id) {
+            if ($adoptionRequest->status !== 'pending') {
+                return response()->json([
+                    'message' => 'This request has already been processed'
+                ], 400);
+            }
+
+            $pet = Pet::findOrFail($adoptionRequest->pet_id);
+
+            if ($pet->user_id !== auth()->id()) {
+                return response()->json([
+                    'message' => 'Unauthorized - You are not the pet owner'
+                ], 403);
+            }
+
+            AdoptionRequest::where('id', $id)->update([
+                'status' => 'rejected',
+                'owner_notes' => $validated['owner_notes'] ?? null
+            ]);
+
             return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized - You can only manage requests for your own pets'
-            ], 403);
+                'message' => 'Request rejected successfully'
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error rejecting request: ' . $e->getMessage()
+            ], 500);
         }
-
-        $adoptionRequest->update([
-            'status' => 'rejected',
-            'reviewed_at' => now(),
-            'owner_notes' => $validated['owner_notes'],
-        ]);
-
-        $adoptionRequest->load(['user', 'pet']);
-
-        if ($adoptionRequest->pet && $adoptionRequest->pet->image) {
-            $adoptionRequest->pet->image_url = asset('storage/' . $adoptionRequest->pet->image);
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Request rejected successfully',
-            'data' => $adoptionRequest
-        ]);
     }
 }

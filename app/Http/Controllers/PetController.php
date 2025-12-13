@@ -46,7 +46,7 @@ public function store(Request $request)
             // Use Laravel's Cloudinary facade with custom HTTP client
             $uploadResult = $request->file('image')->storeOnCloudinary('pets');
             $data['image'] = $uploadResult->getSecurePath();
-            
+
         } catch (\Exception $e) {
             \Log::error('Cloudinary upload failed: ' . $e->getMessage());
             return back()->withErrors(['image' => 'Failed to upload image: ' . $e->getMessage()]);
@@ -90,7 +90,7 @@ public function update(Request $request, Pet $pet)
             // Use Laravel's Cloudinary facade
             $uploadResult = $request->file('image')->storeOnCloudinary('pets');
             $data['image'] = $uploadResult->getSecurePath();
-            
+
         } catch (\Exception $e) {
             \Log::error('Cloudinary upload failed: ' . $e->getMessage());
             return back()->withErrors(['image' => 'Failed to upload image: ' . $e->getMessage()]);

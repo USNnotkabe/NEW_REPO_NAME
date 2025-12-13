@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
@@ -9,17 +9,18 @@ class PetImageController extends Controller
 {
     public function show($filename)
     {
-        $filename = basename($filename);
-        $path = storage_path('app/public/pets/' . $filename);
-        
-        if (!file_exists($path)) {
+        $path = 'pets/' . $filename;
+
+        if (!Storage::disk('public')->exists($path)) {
             abort(404);
         }
-        
-        return response()->file($path, [
-            'Content-Type' => mime_content_type($path),
+
+        $fullPath = storage_path('app/public/' . $path);
+
+        return response()->file($fullPath, [
             'Access-Control-Allow-Origin' => '*',
-            'Cache-Control' => 'public, max-age=31536000',
+            'Access-Control-Allow-Methods' => 'GET',
+            'Access-Control-Allow-Headers' => '*',
         ]);
     }
 }
