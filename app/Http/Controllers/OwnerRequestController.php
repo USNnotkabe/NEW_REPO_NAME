@@ -8,7 +8,7 @@ use App\Models\AdoptionRequest;
 use App\Models\Pet;
 use Illuminate\Support\Facades\DB;
 
-class OwnerRequestController extends Controller  // ✅ FIXED
+class OwnerRequestController extends Controller
 {
     // Get all requests for pets owned by authenticated user
     public function index()

@@ -28,7 +28,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/my-adoption-requests', [AdoptionRequestApiController::class, 'myRequests']);
     Route::post('/adoption-requests', [AdoptionRequestApiController::class, 'store']);
     Route::post('/adoption-requests', [AdoptionRequestApiController::class, 'store']);
-    Route::get('/my-adoption-history', [AdoptionHistoryApiController::class, 'index']);
+    Route::get('/my-adoption-history', action: [AdoptionHistoryApiController::class, 'index']);
+    Route::delete('/adoption-requests/{id}', action: [OwnerRequestApiController::class, 'cancel']);
+
 
     Route::get('/my-pet-requests', [OwnerRequestApiController::class, 'index']);
     Route::post('/pet-requests/{id}/approve', [OwnerRequestApiController::class, 'approve']);

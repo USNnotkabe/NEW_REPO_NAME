@@ -7,7 +7,19 @@ use App\Http\Controllers\AdoptionRequestController;
 use App\Http\Controllers\AdoptionHistoryController;
 use App\Http\Controllers\OwnerRequestController;  // ← ADD THIS!
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\PetListingController;
+use App\Http\Controllers\PetListingController;Route::get('/storage/valid_ids/{filename}', function ($filename) {
+    $path = storage_path('app/public/valid_ids/' . $filename);
+
+    if (!file_exists($path)) {
+        abort(404);
+    }
+
+    return response()->file($path, [
+        'Access-Control-Allow-Origin' => '*',
+        'Content-Type' => 'image/jpeg',
+    ]);
+})->where('filename', '.*');
+
 
 // Welcome page
 Route::get('/', function () {
