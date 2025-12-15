@@ -14,7 +14,13 @@ class AdoptionRequest extends Model
         'pet_id',
         'message',
         'status',
+        'applicant_name',
+        'phone_number',
+        'valid_id_1',
+        'valid_id_2',
+        'admin_notes',
         'owner_notes',
+        'reviewed_by',
         'reviewed_at',
     ];
 
@@ -22,30 +28,18 @@ class AdoptionRequest extends Model
         'reviewed_at' => 'datetime',
     ];
 
-    // Relationships
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function pet()
     {
-        return $this->belongsTo(Pet::class);
+        return $this->belongsTo(Pet::class, 'pet_id');
     }
 
-    // Helper methods
-    public function isPending()
+    public function reviewer()
     {
-        return $this->status === 'pending';
-    }
-
-    public function isApproved()
-    {
-        return $this->status === 'approved';
-    }
-
-    public function isRejected()
-    {
-        return $this->status === 'rejected';
+        return $this->belongsTo(User::class, 'reviewed_by');
     }
 }

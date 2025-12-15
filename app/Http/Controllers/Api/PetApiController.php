@@ -18,7 +18,7 @@ class PetApiController extends Controller{
         $pet->image_url = $baseUrl . '/api/pet-image/' . $filename;
     } else {
         $pet->image_url = null;
-    }
+    }   
     return $pet;
 }
 

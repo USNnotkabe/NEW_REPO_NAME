@@ -22,27 +22,26 @@ class OwnerRequestApiController extends Controller
     }
 
     // Get requests for owner's pets
-    public function index(Request $request)
+    public function index()
     {
-        // Get all pets owned by the logged-in user
-        $petIds = Pet::where('user_id', $request->user()->id)->pluck('id');
-
-        // Get all requests for those pets
-        $requests = AdoptionRequest::with(['user', 'pet'])
-            ->whereIn('pet_id', $petIds)
+        $requests = AdoptionRequest::with(['pet', 'user'])
+            ->whereHas('pet', function ($query) {
+                $query->where('user_id', auth()->id());
+            })
             ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(function ($req) {
-                if ($req->pet) {
-                    $this->appendImageUrl($req->pet);
-                }
-                return $req;
-            });
+            ->get();
 
-        return response()->json([
-            'success' => true,
-            'data' => $requests
-        ]);
+        // Add full URLs for valid IDs
+        $requests->each(function ($request) {
+            if ($request->valid_id_1) {
+                $request->valid_id_1_url = asset('storage/' . $request->valid_id_1);
+            }
+            if ($request->valid_id_2) {
+                $request->valid_id_2_url = asset('storage/' . $request->valid_id_2);
+            }
+        });
+
+        return response()->json($requests, 200);
     }
 
     // Approve a request
@@ -127,5 +126,22 @@ class OwnerRequestApiController extends Controller
                 'message' => 'Error rejecting request: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    public function store(Request $request)
+    {
+        // ✅ ADD THIS DEBUG
+        \Log::info('Adoption Request Data:', $request->all());
+
+        $validated = $request->validate([
+            'pet_id' => 'required|exists:pets,id',
+            'message' => 'required|string|min:20',
+            'applicant_name' => 'nullable|string|max:255',
+            'phone_number' => 'nullable|string|max:20',
+            'valid_id_1' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:5120',
+            'valid_id_2' => 'nullable|file|mimes:jpeg,pn    g,jpg,pdf|max:5120',
+        ]);
+
+        // ... rest of code
     }
 }
